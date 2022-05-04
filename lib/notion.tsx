@@ -7,6 +7,7 @@ export type FieldType = {
     | "number"
     | "boolean"
     | "multi_select"
+    | "select"
     | "rich_text"
     | "title"
     | "files";
@@ -21,10 +22,15 @@ const showPublishedOnly = process.env.PUBLISHED_ONLY;
 const parseItem = (type: string, item) => {
   if (type === "url" || type === "number") return item;
   if (type === "multi_select") return item.map((item: any) => item.name);
+  if (type === "select") return  { text: item?.name || null, color: item?.color || null};
   if (type === "rich_text" || type === "title")
     return item[0]?.plain_text || null;
   if (type === "files") return item[0]?.file.url;
   if (type === "boolean") return item[0]?.checkbox;
+  if (type === "number") {
+   console.log({item})
+    return item[0]?.checkbox;
+  }
 
   return null;
 };
@@ -35,7 +41,7 @@ const parseDatabase = async (id: string, fields: FieldType[]) => {
   });
 
   const items = database.results.map((item) => {
-    const result = { id: item.id };
+    const result = { id: item.id, votes: 0 };
     if ("properties" in item) {
       const { properties } = item;
 
@@ -52,9 +58,7 @@ const parseDatabase = async (id: string, fields: FieldType[]) => {
     return result;
   });
 
-  return items
-    .filter((item) => !showPublishedOnly || item.published)
-    .sort((a, b) => a.order - b.order);
+  return items.sort((a, b) => b.votes - a.votes);
 };
 
 export type BlockType = {
