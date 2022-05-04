@@ -57,9 +57,14 @@ export async function getStaticProps() {
       name: "url",
       type: "url",
     },
+    { name: "status", type: "select" },
+    {name: 'votes', type: 'number'}
   ];
 
   const projects = await parseDatabase(databaseId!, fields);
+
+  console.log({projects})
+
   return { props: { projects }, revalidate: 10 };
 }
 
