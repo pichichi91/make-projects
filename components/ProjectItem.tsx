@@ -1,4 +1,5 @@
 import { useReducer, useState } from "react";
+import { updateVotes } from "../lib/notion";
 
 export type ProjectProps = {
   id: string;
@@ -36,7 +37,9 @@ const ProjectItem: React.FC<ProjectItemProps> = ({ project }) => {
     const { id } = project;
 
     if (!hasVoted) {
-      setVotes((votes) => votes + 1);
+      const newVotes = votes + 1
+      updateVotes(id, newVotes)
+      setVotes(newVotes);
       toggleHasVoted();
     }
   };
