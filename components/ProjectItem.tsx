@@ -40,7 +40,7 @@ const ProjectItem: React.FC<ProjectItemProps> = ({ project }) => {
     if (!hasVoted) {
       const newVotes = (votes || 0) + 1;
 
-      fetch("http://localhost:3000/api/vote", {
+      fetch("/api/vote", {
         method: "PATCH",
         body: JSON.stringify({
           page_id: id,
