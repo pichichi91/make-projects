@@ -62,7 +62,7 @@ export async function getStaticProps() {
   ];
 
   const projects = await parseDatabase(databaseId!, fields);
-  return { props: { projects }, revalidate: 10 };
+  return { props: { projects }, revalidate: 1 };
 }
 
 export default Index;
