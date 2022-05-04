@@ -68,10 +68,18 @@ export type BlockType = {
   };
 };
 
+const updateVotes = async (page_id: string, value: number) => {
+ await notion.pages.update({ page_id, properties: {
+  "votes": { "number": 100 }
+}})
+
+}
+
 const getBlocksFromPage = async (pageId: string) => {
   const page = await notion.blocks.children.list({
     block_id: pageId,
   });
+
 
   const blocks = page.results;
 
@@ -143,4 +151,4 @@ const getPageTitle = async (id: string, fieldName: string = "name") => {
   return "";
 };
 
-export { notion, parseDatabase, getBlocksFromPage, getPageTitle };
+export { updateVotes, notion, parseDatabase, getBlocksFromPage, getPageTitle };

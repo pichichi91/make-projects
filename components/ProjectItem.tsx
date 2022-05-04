@@ -1,4 +1,6 @@
+import { Client } from "@notionhq/client";
 import { useReducer, useState } from "react";
+import { updateVotes } from "../lib/notion";
 
 export type ProjectProps = {
   id: string;
@@ -32,29 +34,36 @@ const ProjectItem: React.FC<ProjectItemProps> = ({ project }) => {
   const [votes, setVotes] = useState<number>(project?.votes || 0);
   const [hasVoted, toggleHasVoted] = useReducer((s) => !s, false);
 
-  const increaseVote = () => {
+  const increaseVote = async () => {
     const { id } = project;
 
     if (!hasVoted) {
-      setVotes((votes) => votes + 1);
+      const newVotes = (votes || 0) + 1;
+
+      fetch("/api/vote", {
+        method: "PATCH",
+        body: JSON.stringify({
+          page_id: id,
+          newVotes,
+        }),
+      })
+        .then((response) => response.text())
+        .then((result) => console.log(result))
+        .catch((error) => console.log("error", error));
+
+      setVotes(newVotes);
       toggleHasVoted();
     }
   };
 
   return (
-  
     <article className="flex w-full justify-center gap-4">
-        <a className={` w-full max-w-2xl  ${text2}`} href={project.url}>
-      <div
-        className={`p-6 ${background} rounded shadow ml-4   `}
-      >
-        <h3 className={` ${text} text-xl font-bold`}>{project.idea}</h3>
-        <p className={` ${text2}`}>{project.description}</p>
-        <p className={` mt-4 ${text2}`}>{project.url}</p>
-
-      
-      
-      </div>
+      <a className={` w-full max-w-2xl  ${text2}`} href={project.url}>
+        <div className={`p-6 ${background} rounded shadow ml-4   `}>
+          <h3 className={` ${text} text-xl font-bold`}>{project.idea}</h3>
+          <p className={` ${text2}`}>{project.description}</p>
+          <p className={` mt-4 ${text2}`}>{project.url}</p>
+        </div>
       </a>
 
       <div className="flex flex-col justify-center mr-4">
