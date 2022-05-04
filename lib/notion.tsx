@@ -69,9 +69,9 @@ export type BlockType = {
 };
 
 const updateVotes = async (page_id: string, value: number) => {
- await notion.pages.update({ page_id, properties: { votes: {
-    number: value
-  }}})
+ await notion.pages.update({ page_id, properties: {
+  "votes": { "number": 100 }
+}})
 
 }
 
