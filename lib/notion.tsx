@@ -17,8 +17,6 @@ const notion = new Client({
   auth: process.env.NEXT_PUBLIC_NOTION_TOKEN,
 });
 
-const showPublishedOnly = process.env.PUBLISHED_ONLY;
-
 const parseItem = (type: string, item: any) => {
   if (type === "url" || type === "number") return item;
   if (type === "multi_select") return item.map((item: any) => item.name);
@@ -41,18 +39,19 @@ const parseDatabase = async (id: string, fields: FieldType[]) => {
   });
 
   const items = database.results.map((item) => {
-    const result = { id: item.id, votes: 0 };
+    const result: any = { id: item.id, votes: 0, icon: '' };
     if ("properties" in item) {
-      const { properties } = item;
+      const { properties } = item as unknown as any;
 
       fields.forEach(({ name, type, newName }) => {
-        if (type in properties[name]) {
-          result[newName || name] = parseItem(type, properties[name][type]);
+        if (name in properties && type in properties[name]) {
+          const item: any = properties[name][type]
+          result[newName || name] = parseItem(type, item);
         }
       });
 
       if (item.icon && "external" in item?.icon) {
-        result["icon"] = item.icon.external.url;
+        result['icon'] = item.icon.external.url;
       }
     }
     return result;
@@ -63,7 +62,7 @@ const parseDatabase = async (id: string, fields: FieldType[]) => {
 
 export type BlockType = {
   type: string;
-  data: {
+  data?: {
     language?: string;
     text?: string;
   };
@@ -76,15 +75,15 @@ const getBlocksFromPage = async (pageId: string) => {
 
   const blocks = page.results;
 
-  const parsedBlocks = blocks.map((block) => {
-    const { type } = block;
+  const parsedBlocks = blocks.map((block: any) => {
+    const { type } = block as unknown as BlockType;
 
-    const result = { type };
+    const result: BlockType = { type };
 
     if (type === "paragraph") {
       result["data"] = {
         text: block["paragraph"].rich_text
-          .map((text) => text.plain_text)
+          .map((text: any) => text.plain_text)
           .join(""),
       };
     }
@@ -92,7 +91,7 @@ const getBlocksFromPage = async (pageId: string) => {
     if (type === "heading_2") {
       result["data"] = {
         text: block["heading_2"].rich_text
-          .map((text) => text.plain_text)
+          .map((text: any) => text.plain_text)
           .join(""),
       };
     }
@@ -100,7 +99,7 @@ const getBlocksFromPage = async (pageId: string) => {
     if (type === "bulleted_list_item") {
       result["data"] = {
         text: block["bulleted_list_item"]["rich_text"].map(
-          (text) => text.plain_text
+          (text: any) => text.plain_text
         ),
       };
     }
@@ -116,7 +115,7 @@ const getBlocksFromPage = async (pageId: string) => {
 
       result["data"] = {
         language: item.language,
-        text: item.rich_text.map((text) => text.plain_text).join(""),
+        text: item.rich_text.map((text: any) => text.plain_text).join(""),
       };
     }
 
@@ -131,8 +130,14 @@ const getPageTitle = async (id: string, fieldName: string = "name") => {
     page_id: id,
   });
 
-  if ("properties" in page && "title" in page.properties[fieldName]) {
-    return page.properties[fieldName]["title"][0]?.plain_text;
+  if ("properties" in page && fieldName in page.properties ) {
+    const item: any = page.properties[fieldName];
+
+    if("title" in item){
+      return item["title"][0]?.plain_text;
+
+    }
+    
   }
 
   return "";
