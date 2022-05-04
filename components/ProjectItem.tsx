@@ -38,13 +38,13 @@ const ProjectItem: React.FC<ProjectItemProps> = ({ project }) => {
     const { id } = project;
 
     if (!hasVoted) {
-      const newVotes = votes + 1;
+      const newVotes = (votes || 0) + 1;
 
       fetch("http://localhost:3000/api/vote", {
         method: "PATCH",
         body: JSON.stringify({
           page_id: id,
-          newVotes: 99,
+          newVotes,
         }),
       })
         .then((response) => response.text())
