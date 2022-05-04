@@ -19,7 +19,7 @@ const notion = new Client({
 
 const showPublishedOnly = process.env.PUBLISHED_ONLY;
 
-const parseItem = (type: string, item) => {
+const parseItem = (type: string, item: any) => {
   if (type === "url" || type === "number") return item;
   if (type === "multi_select") return item.map((item: any) => item.name);
   if (type === "select") return  { text: item?.name || null, color: item?.color || null};
