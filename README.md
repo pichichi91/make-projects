@@ -1,6 +1,5 @@
 # make-projects
 
-🎉 Congratulations, your project was successfully bootstrapped with [Create Next Stack](https://github.com/akd-io/create-next-stack)!
 
 To get started, run:
 
